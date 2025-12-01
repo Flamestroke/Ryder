@@ -2,27 +2,17 @@ package com.ryder.ryder.Users.model.mappers;
 
 import org.mapstruct.*;
 
+import com.ryder.ryder.Users.model.dtos.UserProfileDto;
 import com.ryder.ryder.Users.model.dtos.UserRegisterRequestDto;
 import com.ryder.ryder.Users.model.dtos.UserRegisterResponseDto;
 import com.ryder.ryder.Users.model.entity.Users;
 
+import com.ryder.ryder.Users.model.enums.Role;
+import com.ryder.ryder.Users.model.enums.Status;
+import java.util.Date;
+
 @Mapper(componentModel = "spring")
 public interface UserMapper {
-
-    // @Mapping(target = "id", ignore = true)
-    // @Mapping(target = "passHash", expression = "java(hashPassword(request.getPassword()))")
-    // @Mapping(target = "accountStatus", constant = "ACTIVE")
-    // @Mapping(target = "createdAt", expression = "java(new Date())")
-    // @Mapping(target = "updatedAt", expression = "java(new Date())")
-    // Users toEntity(UserRegisterRequestDto request);
-
-    // UserRegisterResponseDto toResponse(Users user);
-
-    // // MapStruct can't call non-static local methods, so:
-    // static String hashPassword(String password) {
-    //     // call your real password encoder here
-    //     return password; // placeholder
-    // }
 
      // request + encodedPassword → Users entity
     @Mapping(target = "id", ignore = true)
@@ -38,4 +28,6 @@ public interface UserMapper {
 
     // entity → response DTO
     UserRegisterResponseDto toRegisterResponse(Users user);
+
+    UserProfileDto toProfileDto(Users user);
 }

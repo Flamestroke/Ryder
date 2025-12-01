@@ -1,29 +1,61 @@
 package com.ryder.ryder.Users.controllers;
 
-import com.ryder.ryder.Users.model.dtos.UserRegisterRequestDto;
-import com.ryder.ryder.Users.model.dtos.UserRegisterResponseDto;
-import com.ryder.ryder.Users.services.UserService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+
+import java.io.IOException;
+
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import com.ryder.ryder.Users.model.dtos.UserProfileDto;
+import com.ryder.ryder.Users.services.UserService;
+
+import jakarta.servlet.http.HttpServletResponse;
+
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/user")
 @RequiredArgsConstructor
 public class UserController {
+
     private final UserService userService;
 
-    @PostMapping("/register")
-    public ResponseEntity<UserRegisterResponseDto> registerUser(@Valid @RequestBody UserRegisterRequestDto request) {
-        UserRegisterResponseDto response = userService.registerUser(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
+    // @GetMapping("/me")
+    // public ResponseEntity<UserProfileDto> getMyProfile() {
+    // // 1. Who is logged in?
+    // Authentication authentication =
+    // SecurityContextHolder.getContext().getAuthentication();
+    // String currentEmail = authentication.getName();
 
-//    @GetMapping("/auth/login")
-//    public ResponseEntity<xxx> zzz(@Valid @RequestBody www request) {
-//        xxx response = yyy.zzz(request);
-//        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-//    }
+    // // 2. Get their profile (Service uses MapStruct internally)
+    // UserProfileDto profile = userService.getMyProfile(currentEmail);
+
+    // // 3. Return it
+    // return ResponseEntity.ok(profile);
+    // }
+
+    // @GetMapping("/me")
+    // public String getMyProfile() {
+    // System.out.println("--- BYPASS TEST HIT ---");
+    // return "IF YOU SEE THIS, THE APP IS FINE";
+    // }
+
+    // @GetMapping("/me")
+    // public ResponseEntity<UserProfileDto> getMyProfile() {
+    // // Hardcode your email for now (since we are bypassed)
+    // String testEmail = "jannet@example.com";
+
+    // UserProfileDto profile = userService.getMyProfile(testEmail);
+    // return ResponseEntity.ok(profile);
+    // }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserProfileDto> getMyProfile() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentEmail = authentication.getName();
+
+        UserProfileDto profile = userService.getMyProfile(currentEmail);
+        return ResponseEntity.ok(profile);
+    }
 }
