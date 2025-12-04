@@ -3,9 +3,7 @@ package com.ryder.ryder.Users.model.entity;
 import com.ryder.ryder.Users.model.enums.Role;
 import com.ryder.ryder.Users.model.enums.Status;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Collection;
 import java.util.Date;
@@ -51,8 +49,6 @@ public class Users implements UserDetails {
 
     @Column(nullable = false)
     private Date updatedAt;
-    // private int refreshToken;
-    // private int passResetToken;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

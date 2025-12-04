@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.ryder.ryder.Users.model.dtos.UserProfileDto;
 import com.ryder.ryder.Users.model.dtos.UserRegisterRequestDto;
 import com.ryder.ryder.Users.model.dtos.UserRegisterResponseDto;
+import com.ryder.ryder.Users.model.dtos.UserUpdateRequestDto;
 import com.ryder.ryder.Users.model.entity.Users;
 import com.ryder.ryder.Users.model.mappers.UserMapper;
 import com.ryder.ryder.Users.repositories.UsersRepo;
@@ -24,6 +25,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
+    // Register User
     @Override
     public UserRegisterResponseDto registerUser(UserRegisterRequestDto request) {
 
@@ -35,25 +37,37 @@ public class UserServiceImpl implements UserService {
             throw new PhoneAlreadyExistsException("Phone is already Registered!!");
         }
 
-        // 1. Encode password
         String encodedPassword = passwordEncoder.encode(request.getPassword());
 
-        // 2. Map DTO → Entity
         Users user = userMapper.toEntity(request, encodedPassword);
 
-        // 3. Save
-        Users saved = usersRepo.save(user);
+        Users savedUser = usersRepo.save(user);
 
-        return userMapper.toRegisterResponse(saved);
+        return userMapper.toRegisterResponse(savedUser);
 
     }
 
+    // User Profile
     @Override
     public UserProfileDto getMyProfile(String email) {
+
         Users user = usersRepo.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found!!"));
 
         return userMapper.toProfileDto(user);
+    }
+
+    // Update User Profile
+    @Override
+    public UserProfileDto updateMyProfile(String email, UserUpdateRequestDto request) {
+        
+        Users user = usersRepo.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found!!"));
+
+        userMapper.updateUserFromDto(request, user);
+
+        Users updatedUser = usersRepo.save(user);
+
+        return userMapper.toProfileDto(updatedUser);
     }
 
 }
