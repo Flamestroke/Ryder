@@ -4,6 +4,7 @@ import java.util.Date;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.locationtech.jts.geom.Point;
 
 import com.ryder.ryder.Location.model.entity.Coordinates;
 import com.ryder.ryder.Trips.model.enums.TripStatus;
@@ -19,51 +20,42 @@ import lombok.*;
 @Table(name = "trips")
 public class Trips {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
 
-    // Get Rider From Users.java
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "rider_id", nullable = false)
-    private Users rider;
+        // Get Rider From Users.java
+        @ManyToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "rider_id", nullable = false)
+        private Users rider;
 
-    // Get Driver From Users.java
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "driver_id")
-    private Users driver;
+        // Get Driver From Users.java
+        @ManyToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "driver_id")
+        private Users driver;
 
-    // Get Latitude and Longitude from Coordinates.java for source of trip
-    @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "latitude", column = @Column(name = "source_latitude")),
-            @AttributeOverride(name = "longitude", column = @Column(name = "source_longitude"))
-    })
-    private Coordinates source;
+        // PostGIS definition
+        @Column(columnDefinition = "geometry(Point, 4326)")
+        private Point source;
 
-    // Get Latitude and Longitude from Coordinates.java for destination of trip
-    @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "latitude", column = @Column(name = "destination_latitude")),
-            @AttributeOverride(name = "longitude", column = @Column(name = "destination_longitude"))
-    })
-    private Coordinates destination;
+        @Column(columnDefinition = "geometry(Point, 4326)")
+        private Point destination;
 
-    @Enumerated(EnumType.STRING)
-    private TripStatus status;
+        @Enumerated(EnumType.STRING)
+        private TripStatus status;
 
-    private Double fare;
+        private Double fare;
 
-    private String otp;
+        private String otp;
 
-    @CreationTimestamp
-    private Date requestedAt;
+        @CreationTimestamp
+        private Date requestedAt;
 
-    private Date startedAt;
+        private Date startedAt;
 
-    private Date completedAt;
+        private Date completedAt;
 
-    @UpdateTimestamp
-    private Date updatedAt;
+        @UpdateTimestamp
+        private Date updatedAt;
 
 }

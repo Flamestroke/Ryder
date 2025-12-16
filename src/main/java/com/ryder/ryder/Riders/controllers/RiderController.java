@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ryder.ryder.Riders.services.RiderService;
 import com.ryder.ryder.Riders.services.RiderTripService;
 import com.ryder.ryder.Trips.model.dtos.TripHistoryDto;
+import com.ryder.ryder.Trips.model.dtos.TripRequestDto;
 import com.ryder.ryder.Trips.model.dtos.TripResponseDto;
 import com.ryder.ryder.Trips.services.TripService;
 import com.ryder.ryder.Users.model.dtos.UserProfileDto;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
 @RestController
 @RequestMapping("/rider")
@@ -59,4 +61,11 @@ public class RiderController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return ResponseEntity.ok(riderTripService.getTripHistory(authentication.getName(), page, size));
     }
+
+    @PostMapping("/trips/request")
+    public ResponseEntity<TripResponseDto> requestRide(@RequestBody TripRequestDto request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return ResponseEntity.ok(riderTripService.requestRide(authentication.getName(), request));
+    }
+
 }
