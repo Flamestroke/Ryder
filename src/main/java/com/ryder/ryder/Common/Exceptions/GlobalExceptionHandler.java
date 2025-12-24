@@ -18,113 +18,121 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // Validation errors from DTOs
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponseDto> handleValidationException(
-            MethodArgumentNotValidException ex,
-            HttpServletRequest request
-    ) {
-        Map<String, String> validationErrors = new HashMap<>();
-        for (var error : ex.getBindingResult().getAllErrors()) {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            validationErrors.put(fieldName, errorMessage);
+        // General Business Logic Errors (like "Active Trip")
+        @ExceptionHandler(RuntimeException.class)
+        public ResponseEntity<ErrorResponseDto> handleRuntimeException(RuntimeException ex,
+                        HttpServletRequest request) {
+                ErrorResponseDto body = ErrorResponseDto.builder()
+                                .timestamp(LocalDateTime.now())
+                                .status(HttpStatus.BAD_REQUEST.value())
+                                .error("Bad Request")
+                                .message(ex.getMessage())
+                                .path(request.getRequestURI())
+                                .build();
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
         }
 
-        ErrorResponseDto body = ErrorResponseDto.builder()
-                .timestamp(LocalDateTime.now())
-                .status(HttpStatus.BAD_REQUEST.value())
-                .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
-                .message("Validation failed")
-                .path(request.getRequestURI())
-                .validationErrors(validationErrors)
-                .build();
+        // Validation errors from DTOs
+        @ExceptionHandler(MethodArgumentNotValidException.class)
+        public ResponseEntity<ErrorResponseDto> handleValidationException(
+                        MethodArgumentNotValidException ex,
+                        HttpServletRequest request) {
+                Map<String, String> validationErrors = new HashMap<>();
+                for (var error : ex.getBindingResult().getAllErrors()) {
+                        String fieldName = ((FieldError) error).getField();
+                        String errorMessage = error.getDefaultMessage();
+                        validationErrors.put(fieldName, errorMessage);
+                }
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
-    }
+                ErrorResponseDto body = ErrorResponseDto.builder()
+                                .timestamp(LocalDateTime.now())
+                                .status(HttpStatus.BAD_REQUEST.value())
+                                .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                                .message("Validation failed")
+                                .path(request.getRequestURI())
+                                .validationErrors(validationErrors)
+                                .build();
 
-    // Incorrect JSON / wrong types in request body
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorResponseDto> handleNotReadable(
-            HttpMessageNotReadableException ex,
-            HttpServletRequest request
-    ) {
-        ErrorResponseDto body = ErrorResponseDto.builder()
-                .timestamp(LocalDateTime.now())
-                .status(HttpStatus.BAD_REQUEST.value())
-                .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
-                .message("Malformed JSON request")
-                .path(request.getRequestURI())
-                .build();
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+        }
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
-    }
+        // Incorrect JSON / wrong types in request body
+        @ExceptionHandler(HttpMessageNotReadableException.class)
+        public ResponseEntity<ErrorResponseDto> handleNotReadable(
+                        HttpMessageNotReadableException ex,
+                        HttpServletRequest request) {
+                ErrorResponseDto body = ErrorResponseDto.builder()
+                                .timestamp(LocalDateTime.now())
+                                .status(HttpStatus.BAD_REQUEST.value())
+                                .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                                .message("Malformed JSON request")
+                                .path(request.getRequestURI())
+                                .build();
 
-    // Duplicate / constraint errors from DB (fallback)
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ErrorResponseDto> handleDataIntegrity(
-            DataIntegrityViolationException ex,
-            HttpServletRequest request
-    ) {
-        ErrorResponseDto body = ErrorResponseDto.builder()
-                .timestamp(LocalDateTime.now())
-                .status(HttpStatus.CONFLICT.value())
-                .error(HttpStatus.CONFLICT.getReasonPhrase())
-                .message("Data integrity violation (possibly duplicate or invalid data)")
-                .path(request.getRequestURI())
-                .build();
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+        }
 
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
-    }
+        // Duplicate / constraint errors from DB (fallback)
+        @ExceptionHandler(DataIntegrityViolationException.class)
+        public ResponseEntity<ErrorResponseDto> handleDataIntegrity(
+                        DataIntegrityViolationException ex,
+                        HttpServletRequest request) {
+                ErrorResponseDto body = ErrorResponseDto.builder()
+                                .timestamp(LocalDateTime.now())
+                                .status(HttpStatus.CONFLICT.value())
+                                .error(HttpStatus.CONFLICT.getReasonPhrase())
+                                .message("Data integrity violation (possibly duplicate or invalid data)")
+                                .path(request.getRequestURI())
+                                .build();
 
-    // Email already exists Error
-    @ExceptionHandler(EmailAlreadyExistsException.class)
-    public ResponseEntity<ErrorResponseDto> handleUserAlreadyExists(
-            EmailAlreadyExistsException ex,
-            HttpServletRequest request
-    ) {
-        ErrorResponseDto body = ErrorResponseDto.builder()
-                .timestamp(LocalDateTime.now())
-                .status(HttpStatus.CONFLICT.value())
-                .error(HttpStatus.CONFLICT.getReasonPhrase())
-                .message(ex.getMessage())
-                .path(request.getRequestURI())
-                .build();
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
+        }
 
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
-    }
+        // Email already exists Error
+        @ExceptionHandler(EmailAlreadyExistsException.class)
+        public ResponseEntity<ErrorResponseDto> handleUserAlreadyExists(
+                        EmailAlreadyExistsException ex,
+                        HttpServletRequest request) {
+                ErrorResponseDto body = ErrorResponseDto.builder()
+                                .timestamp(LocalDateTime.now())
+                                .status(HttpStatus.CONFLICT.value())
+                                .error(HttpStatus.CONFLICT.getReasonPhrase())
+                                .message(ex.getMessage())
+                                .path(request.getRequestURI())
+                                .build();
 
-    // Phone already exists Error
-    @ExceptionHandler(PhoneAlreadyExistsException.class)
-    public ResponseEntity<ErrorResponseDto> handleUserNotFound(
-            PhoneAlreadyExistsException ex,
-            HttpServletRequest request
-    ) {
-        ErrorResponseDto body = ErrorResponseDto.builder()
-                .timestamp(LocalDateTime.now())
-                .status(HttpStatus.CONFLICT.value())
-                .error(HttpStatus.CONFLICT.getReasonPhrase())
-                .message(ex.getMessage())
-                .path(request.getRequestURI())
-                .build();
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
+        }
 
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
-    }
+        // Phone already exists Error
+        @ExceptionHandler(PhoneAlreadyExistsException.class)
+        public ResponseEntity<ErrorResponseDto> handleUserNotFound(
+                        PhoneAlreadyExistsException ex,
+                        HttpServletRequest request) {
+                ErrorResponseDto body = ErrorResponseDto.builder()
+                                .timestamp(LocalDateTime.now())
+                                .status(HttpStatus.CONFLICT.value())
+                                .error(HttpStatus.CONFLICT.getReasonPhrase())
+                                .message(ex.getMessage())
+                                .path(request.getRequestURI())
+                                .build();
 
-    // For anything unexpected
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponseDto> handleGeneric(
-            Exception ex,
-            HttpServletRequest request
-    ) {
-        ErrorResponseDto body = ErrorResponseDto.builder()
-                .timestamp(LocalDateTime.now())
-                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
-                .message(ex.getMessage())
-                .path(request.getRequestURI())
-                .build();
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
+        }
 
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
-    }
+        // For anything unexpected
+        @ExceptionHandler(Exception.class)
+        public ResponseEntity<ErrorResponseDto> handleGeneric(
+                        Exception ex,
+                        HttpServletRequest request) {
+                ErrorResponseDto body = ErrorResponseDto.builder()
+                                .timestamp(LocalDateTime.now())
+                                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                                .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
+                                .message(ex.getMessage())
+                                .path(request.getRequestURI())
+                                .build();
+
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
+        }
 }

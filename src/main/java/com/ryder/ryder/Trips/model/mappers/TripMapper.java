@@ -15,11 +15,23 @@ import com.ryder.ryder.Users.model.mappers.UserMapper;
 @Mapper(componentModel = "spring", uses = { UserMapper.class })
 public interface TripMapper {
 
+    @Mapping(source = "status", target = "tripStatus")
     TripResponseDto toResponseDto(Trips trips);
 
-    @Mapping(target = "date", source = "requestedAt")   
+    @Mapping(target = "date", source = "requestedAt")
+    @Mapping(source = "status", target = "tripStatus")
     TripHistoryDto toHistoryDto(Trips trips);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "rider", ignore = true)
+    @Mapping(target = "driver", ignore = true)
+    @Mapping(target = "otp", ignore = true)
+    @Mapping(target = "fare", ignore = true)
+    @Mapping(target = "status", ignore = true)
+    @Mapping(target = "requestedAt", ignore = true)
+    @Mapping(target = "startedAt", ignore = true)
+    @Mapping(target = "completedAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     Trips toEntity(TripRequestDto request);
 
     // for toResponseDto (to Coordinates)

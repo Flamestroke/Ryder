@@ -1,6 +1,6 @@
 package com.ryder.ryder.Trips.model.dtos;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import com.ryder.ryder.Location.model.entity.Coordinates;
 import com.ryder.ryder.Trips.model.enums.TripStatus;
@@ -22,5 +22,5 @@ public class TripResponseDto {
     private TripStatus tripStatus;
     private Double fare;
     private String otp;
-    private Date requestedAt;
+    private LocalDateTime requestedAt;
 }

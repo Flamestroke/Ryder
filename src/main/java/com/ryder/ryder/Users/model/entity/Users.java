@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import org.locationtech.jts.geom.Point;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -49,6 +50,9 @@ public class Users implements UserDetails {
 
     @Column(nullable = false)
     private Date updatedAt;
+
+    @Column(columnDefinition = "geometry(Point, 4326)")
+    private Point curr_location;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

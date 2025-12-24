@@ -23,6 +23,10 @@ public class GeometryUtil {
         return new Coordinates(point.getY(), point.getX());
     }
 
+    public static Coordinates createCoordinates(Double latitude, Double longitude) {
+        return new Coordinates(longitude, latitude);
+    }
+
     public static double calculateDistancekm(Point src, Point des) {
         return calculateHaversineDistance(src.getX(), src.getY(), des.getX(), des.getY());
     }

@@ -1,6 +1,6 @@
 package com.ryder.ryder.Trips.model.entity;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -49,13 +49,13 @@ public class Trips {
         private String otp;
 
         @CreationTimestamp
-        private Date requestedAt;
+        private LocalDateTime requestedAt;
 
-        private Date startedAt;
+        private LocalDateTime startedAt;
 
-        private Date completedAt;
+        private LocalDateTime completedAt;
 
         @UpdateTimestamp
-        private Date updatedAt;
+        private LocalDateTime updatedAt;
 
 }
