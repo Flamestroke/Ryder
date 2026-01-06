@@ -11,6 +11,7 @@ import com.ryder.ryder.Users.repositories.UsersRepo;
 
 import lombok.RequiredArgsConstructor;
 
+// used By JwtAuthentication
 @Service
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -18,7 +19,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        
+
         Users user = usersRepo.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 

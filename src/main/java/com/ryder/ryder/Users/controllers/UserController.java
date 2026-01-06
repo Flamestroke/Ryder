@@ -18,6 +18,8 @@ public class UserController {
 
     private final UserService userService;
 
+    // Show User Profile
+    // Maybe remove cuz driver and rider have their own show profile
     @GetMapping("/me")
     public ResponseEntity<UserProfileDto> getMyProfile() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -27,6 +29,8 @@ public class UserController {
         return ResponseEntity.ok(profile);
     }
 
+    // Update User Profile
+    // Maybe remove cuz driver and rider have their own show profile
     @PutMapping("/me")
     public ResponseEntity<UserProfileDto> updateProfile(@RequestBody UserUpdateRequestDto request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

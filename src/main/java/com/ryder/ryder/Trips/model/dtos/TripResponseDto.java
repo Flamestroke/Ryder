@@ -2,6 +2,7 @@ package com.ryder.ryder.Trips.model.dtos;
 
 import java.time.LocalDateTime;
 
+import com.ryder.ryder.Drivers.model.dtos.VehicleDataDto;
 import com.ryder.ryder.Location.model.entity.Coordinates;
 import com.ryder.ryder.Trips.model.enums.TripStatus;
 import com.ryder.ryder.Users.model.dtos.UserProfileDto;
@@ -17,6 +18,7 @@ public class TripResponseDto {
 
     private Long id;
     private UserProfileDto driver;
+    private VehicleDataDto vehicleData;
     private Coordinates source;
     private Coordinates destination;
     private TripStatus tripStatus;

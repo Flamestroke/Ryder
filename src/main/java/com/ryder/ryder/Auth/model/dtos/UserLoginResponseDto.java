@@ -8,11 +8,4 @@ import lombok.Data;
 public class UserLoginResponseDto {
     private String accessToken;
     private String tokenType = "Bearer";
-    // private long id;
-    // private String fullName;
-    // private String email;
-    // private String phone;
-    // private Role role;
-    // private Status accountStatus;
-    // private boolean loginSuccessful;
 }

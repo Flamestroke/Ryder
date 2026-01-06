@@ -91,6 +91,7 @@ public class RiderTripServiceImpl implements RiderTripService {
                 p2.getY(), p2.getX());
     }
 
+    // Otp generation
     private String generateRandomOtp() {
         return String.format("%04d", new Random().nextInt(10000));
     }

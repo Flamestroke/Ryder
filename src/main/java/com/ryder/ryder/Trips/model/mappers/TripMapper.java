@@ -16,6 +16,7 @@ import com.ryder.ryder.Users.model.mappers.UserMapper;
 public interface TripMapper {
 
     @Mapping(source = "status", target = "tripStatus")
+    @Mapping(source = "driver.vehicle",target = "vehicleData")
     TripResponseDto toResponseDto(Trips trips);
 
     @Mapping(target = "date", source = "requestedAt")

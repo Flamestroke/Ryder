@@ -1,5 +1,6 @@
 package com.ryder.ryder.Users.model.entity;
 
+import com.ryder.ryder.Drivers.model.entity.Vehicle;
 import com.ryder.ryder.Users.model.enums.Role;
 import com.ryder.ryder.Users.model.enums.Status;
 import jakarta.persistence.*;
@@ -53,6 +54,9 @@ public class Users implements UserDetails {
 
     @Column(columnDefinition = "geometry(Point, 4326)")
     private Point curr_location;
+
+    @OneToOne(mappedBy = "driver")
+    private Vehicle vehicle;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -8,8 +8,14 @@ import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Service;
 
+import com.ryder.ryder.Common.Exceptions.InvalidCredentialsException;
+import com.ryder.ryder.Common.Exceptions.NotFoundException;
 import com.ryder.ryder.Drivers.model.dtos.DriverLocationDto;
 import com.ryder.ryder.Drivers.model.dtos.StartRideDto;
+import com.ryder.ryder.Drivers.model.dtos.VehicleDataDto;
+import com.ryder.ryder.Drivers.model.entity.Vehicle;
+import com.ryder.ryder.Drivers.model.mappers.VehicleMapper;
+import com.ryder.ryder.Drivers.repositories.VehicleRepo;
 import com.ryder.ryder.Location.model.utils.GeometryUtil;
 import com.ryder.ryder.Trips.model.dtos.TripResponseDto;
 import com.ryder.ryder.Trips.model.entity.Trips;
@@ -17,8 +23,11 @@ import com.ryder.ryder.Trips.model.enums.TripStatus;
 import com.ryder.ryder.Trips.model.mappers.TripMapper;
 import com.ryder.ryder.Trips.repositories.TripsRepo;
 import com.ryder.ryder.Trips.services.TripService;
+import com.ryder.ryder.Users.model.dtos.UserProfileDto;
+import com.ryder.ryder.Users.model.dtos.UserUpdateRequestDto;
 import com.ryder.ryder.Users.model.entity.Users;
 import com.ryder.ryder.Users.repositories.UsersRepo;
+import com.ryder.ryder.Users.services.UserService;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -28,15 +37,46 @@ import lombok.RequiredArgsConstructor;
 public class DriverServiceImpl implements DriverService {
 
     private final UsersRepo usersRepo;
+    private final UserService userService;
 
     private final TripsRepo tripsRepo;
     private final TripMapper tripMapper;
 
+    private final VehicleRepo VehicleRepo;
+    private final VehicleMapper vehicleMapper;
+
+    // Show Rider Profile
+    @Override
+    public UserProfileDto getMyProfileDto(String driverEmail) {
+        return userService.getMyProfile(driverEmail);
+    }
+
+    // Update Rider Profile
+    @Override
+    public UserProfileDto updateMyProfile(String driverEmail, UserUpdateRequestDto request) {
+        return userService.updateMyProfile(driverEmail, request);
+    }
+
+    // Add Vehicle Details of the Driver
+    @Override
+    public VehicleDataDto addVehicle(String driverEmail, VehicleDataDto vehicleDataDto) {
+        Users driver = usersRepo.findByEmail(driverEmail)
+                .orElseThrow(() -> new NotFoundException("Driver not Found!"));
+
+        Vehicle vehicle = vehicleMapper.toEntity(vehicleDataDto);
+
+        vehicle.setDriver(driver);
+
+        VehicleRepo.save(vehicle);
+        return vehicleMapper.toDto(vehicle);
+    }
+
     // Driver location update
+    // to be done by websocket
     @Override
     public DriverLocationDto updateCurrentLocation(String driverEmail, DriverLocationDto driverLocationDto) {
         Users driver = usersRepo.findByEmail(driverEmail)
-                .orElseThrow(() -> new RuntimeException("Driver not Found!"));
+                .orElseThrow(() -> new NotFoundException("Driver not Found!"));
 
         Point point = GeometryUtil.createPoint(
                 GeometryUtil.createCoordinates(driverLocationDto.getLongitude(), driverLocationDto.getLatitude()));
@@ -47,10 +87,10 @@ public class DriverServiceImpl implements DriverService {
         return driverLocationDto;
     }
 
-    // Nearby rides search
+    // Search for rides(customer) near current location
     @Override
     public List<TripResponseDto> getNearbyRides(String driverEmail) {
-        Users driver = usersRepo.findByEmail(driverEmail).orElseThrow(() -> new RuntimeException("Driver Not Found!"));
+        Users driver = usersRepo.findByEmail(driverEmail).orElseThrow(() -> new NotFoundException("Driver Not Found!"));
 
         if (driver.getCurr_location() == null) {
             throw new RuntimeException("Driver location Unknown. Please go Online!");
@@ -67,14 +107,14 @@ public class DriverServiceImpl implements DriverService {
 
     }
 
-    // Ride Acceptance
+    // Accept REQUESTED ride
     @Override
     // for concurrency
     @Transactional
     public TripResponseDto acceptRide(Long tripId, String driverEmail) {
-        Users driver = usersRepo.findByEmail(driverEmail).orElseThrow(() -> new RuntimeException("Driver not Found!"));
+        Users driver = usersRepo.findByEmail(driverEmail).orElseThrow(() -> new NotFoundException("Driver not Found!"));
 
-        Trips trip = tripsRepo.findById(tripId).orElseThrow(() -> new RuntimeException("Trip  not found!"));
+        Trips trip = tripsRepo.findById(tripId).orElseThrow(() -> new NotFoundException("Trip  not found!"));
 
         // if Ride is accepted
         if (!trip.getStatus().equals(TripStatus.REQUESTED)) {
@@ -89,14 +129,15 @@ public class DriverServiceImpl implements DriverService {
 
     }
 
+    // Start ACCEPTED ride
     @Override
     public TripResponseDto startRide(String driverEmail, StartRideDto startRideDto) {
 
         Users driver = usersRepo.findByEmail(driverEmail)
-                .orElseThrow(() -> new RuntimeException("Driver not Found!"));
+                .orElseThrow(() -> new NotFoundException("Driver not Found!"));
 
         Trips trip = tripsRepo.findById(startRideDto.getTripId())
-                .orElseThrow(() -> new RuntimeException("Trip not found!"));
+                .orElseThrow(() -> new NotFoundException("Trip not found!"));
 
         if (!trip.getDriver().equals(driver)) {
             throw new RuntimeException("Trip not assigned to you");
@@ -105,7 +146,7 @@ public class DriverServiceImpl implements DriverService {
             throw new RuntimeException("Ride cannot be accepted. Status is: " + trip.getStatus());
         }
         if (!trip.getOtp().equals(startRideDto.getOtp())) {
-            throw new RuntimeException("OTP does not match!");
+            throw new InvalidCredentialsException("OTP does not match!");
         }
 
         trip.setStatus(TripStatus.STARTED);
@@ -115,14 +156,15 @@ public class DriverServiceImpl implements DriverService {
         return tripMapper.toResponseDto(trip);
     }
 
+    // Complete STARTED ride
     @Override
     public TripResponseDto completeRide(Long tripId, String driverEmail) {
 
         Users driver = usersRepo.findByEmail(driverEmail)
-                .orElseThrow(() -> new RuntimeException("Driver not Found!"));
+                .orElseThrow(() -> new NotFoundException("Driver not Found!"));
 
         Trips trip = tripsRepo.findById(tripId)
-                .orElseThrow(() -> new RuntimeException("Trip not found!"));
+                .orElseThrow(() -> new NotFoundException("Trip not found!"));
 
         if (!trip.getDriver().equals(driver)) {
             throw new RuntimeException("Trip not assigned to you");
@@ -140,5 +182,4 @@ public class DriverServiceImpl implements DriverService {
 
         return tripMapper.toResponseDto(trip);
     }
-
 }

@@ -16,11 +16,13 @@ public class RiderServiceImpl implements RiderService {
 
     private final UserService userService;
 
+    // Show Rider Profile
     @Override
     public UserProfileDto getMyProfileDto(String email) {
         return userService.getMyProfile(email);
     }
 
+    // Update Rider Profile
     @Override
     public UserProfileDto updateMyProfile(String email, UserUpdateRequestDto request) {
         return userService.updateMyProfile(email, request);

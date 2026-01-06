@@ -16,7 +16,6 @@ public class AuthServiceImpl implements AuthService {
 
     private UsersRepo usersRepo;
     private PasswordEncoder passwordEncoder ;
-    // private LoginMapper loginMapper;
     private JwtService jwtService;
 
     @Override

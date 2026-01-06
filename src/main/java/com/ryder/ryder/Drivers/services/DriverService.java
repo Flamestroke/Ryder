@@ -6,7 +6,10 @@ import org.springframework.stereotype.Service;
 
 import com.ryder.ryder.Drivers.model.dtos.DriverLocationDto;
 import com.ryder.ryder.Drivers.model.dtos.StartRideDto;
+import com.ryder.ryder.Drivers.model.dtos.VehicleDataDto;
 import com.ryder.ryder.Trips.model.dtos.TripResponseDto;
+import com.ryder.ryder.Users.model.dtos.UserProfileDto;
+import com.ryder.ryder.Users.model.dtos.UserUpdateRequestDto;
 
 @Service
 public interface DriverService {
@@ -20,5 +23,11 @@ public interface DriverService {
     TripResponseDto startRide(String driverEmail, StartRideDto startRideDto);
 
     TripResponseDto completeRide(Long tripId, String driverEmail);
+
+    VehicleDataDto addVehicle(String driverEmail, VehicleDataDto vehicleDataDto);
+
+    UserProfileDto getMyProfileDto(String driverEmail);
+
+    UserProfileDto updateMyProfile(String driverEmail, UserUpdateRequestDto request);
 
 }

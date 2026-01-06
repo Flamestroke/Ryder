@@ -25,7 +25,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
-    // Register User
+    // Register new User
     @Override
     public UserRegisterResponseDto registerUser(UserRegisterRequestDto request) {
 
@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    // User Profile
+    //Show User Profile
     @Override
     public UserProfileDto getMyProfile(String email) {
 

@@ -23,14 +23,17 @@ public class GeometryUtil {
         return new Coordinates(point.getY(), point.getX());
     }
 
-    public static Coordinates createCoordinates(Double latitude, Double longitude) {
+    // DriverServiceImpl to DTO
+    public static Coordinates createCoordinates(Double longitude, Double latitude) {
         return new Coordinates(longitude, latitude);
     }
 
+    // Convert Points to distanceKm for the formula
     public static double calculateDistancekm(Point src, Point des) {
         return calculateHaversineDistance(src.getX(), src.getY(), des.getX(), des.getY());
     }
 
+    // Haversine Distance Formula to calculate distance between two points
     public static double calculateHaversineDistance(double lat1, double lon1, double lat2, double lon2) {
         double dlat = Math.toRadians(lat2 - lat1);
         double dlon = Math.toRadians(lon2 - lon1);

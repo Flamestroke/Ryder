@@ -9,6 +9,4 @@ public interface TripService {
 
     // TripResponseDto getCurrentRide(riderId);
 
-
-
 }

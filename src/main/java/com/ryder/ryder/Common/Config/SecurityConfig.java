@@ -36,6 +36,7 @@ public class SecurityConfig {
     private final PasswordEncoder passwordEncoder;
     private final JwtAuthenticationEntryPoint jwtEntryPoint;
 
+    // Handles authentication for all endpoints
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
@@ -54,7 +55,7 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return email -> usersRepo.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("user not found"));
+        return email -> usersRepo.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     @Bean
